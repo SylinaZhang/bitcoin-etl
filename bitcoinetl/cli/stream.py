@@ -39,7 +39,8 @@ logging_basic_config()
 @click.option('-p', '--provider-uri', default='http://user:pass@localhost:8332', type=str,
               help='The URI of the remote Bitcoin node.')
 @click.option('-o', '--output', type=str,
-              help='Google PubSub topic path e.g. projects/your-project/topics/bitcoin_blockchain. '
+              help='Either Google PubSub topic path e.g. projects/your-project/topics/bitcoin_blockchain. '
+              'or Kinesis, e.g. kinesis://your-data-stream-name'
                    'If not specified will print to console.')
 @click.option('-s', '--start-block', default=None, type=int, help='Start block.')
 @click.option('-c', '--chain', default=Chain.BITCOIN, type=click.Choice(Chain.ALL), help='The type of chain.')
@@ -57,13 +58,14 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, chain
     configure_logging(log_file)
     configure_signals()
 
-    from bitcoinetl.streaming.streaming_utils import get_item_exporter
+    # from bitcoinetl.streaming.streaming_utils import get_item_exporter
+    from bitcoinetl.streaming.item_exporter_creator import create_item_exporters
     from bitcoinetl.streaming.btc_streamer_adapter import BtcStreamerAdapter
     from blockchainetl.streaming.streamer import Streamer
 
     streamer_adapter = BtcStreamerAdapter(
         bitcoin_rpc=ThreadLocalProxy(lambda: BitcoinRpc(provider_uri)),
-        item_exporter=get_item_exporter(output),
+        item_exporter=create_item_exporters(output),
         chain=chain,
         batch_size=batch_size,
         enable_enrich=enrich,
@@ -76,6 +78,6 @@ def stream(last_synced_block_file, lag, provider_uri, output, start_block, chain
         start_block=start_block,
         period_seconds=period_seconds,
         block_batch_size=block_batch_size,
-        pid_file=pid_file,
+        pid_file=pid_file
     )
     streamer.stream()

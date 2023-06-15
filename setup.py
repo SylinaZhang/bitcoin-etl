@@ -40,6 +40,10 @@ setup(
             'timeout-decorator==0.4.1',
             'google-cloud-pubsub==0.39.1'
         ],
+        'streaming-kinesis': [
+            'boto3==1.24.11',
+            'botocore==1.27.11',
+        ],
         'dev': [
             'pytest~=4.3.0'
         ],
