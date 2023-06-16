@@ -59,7 +59,7 @@ class KinesisItemExporter:
             data = json.dumps(chunk, default=str)
             data_size = len(data.encode("utf-8")
 
-            if data_size > KINESIS_SIZE_LIMIT:
+            if data_size > KINESIS_SIZE_LIMIT：
                 continue
             self._kinesis_client.put_records(
                 StreamName=self._stream_name,
