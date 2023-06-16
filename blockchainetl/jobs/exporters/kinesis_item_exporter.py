@@ -55,6 +55,12 @@ class KinesisItemExporter:
             fillvalue=sentinel,
         )
         for chunk in chunks:
+            KINESIS_SIZE_LIMIT = 1048576 # actually, it is 1048576
+            data = json.dumps(chunk, default=str)
+            data_size = len(data.encode("utf-8")
+
+            if data_size > KINESIS_SIZE_LIMIT:
+                continue
             self._kinesis_client.put_records(
                 StreamName=self._stream_name,
                 Records=[
