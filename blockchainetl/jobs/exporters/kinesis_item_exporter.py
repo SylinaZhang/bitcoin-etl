@@ -58,8 +58,12 @@ class KinesisItemExporter:
             KINESIS_SIZE_LIMIT = 1048576 # actually, it is 1048576
             data = json.dumps(chunk, default=str)
             data_size = len(data.encode("utf-8"))
+            file_bigblock = open('~/bigblock.txt', 'w')
+            i = 0
 
             if data_size > KINESIS_SIZE_LIMIT:
+                file_bigblock.write( i + " " + data + "\n")
+                i = i+1
                 continue
             self._kinesis_client.put_records(
                 StreamName=self._stream_name,
