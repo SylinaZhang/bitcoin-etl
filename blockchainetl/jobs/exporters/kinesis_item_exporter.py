@@ -64,20 +64,20 @@ class KinesisItemExporter:
             # i = 0
 
             if data_size > KINESIS_SIZE_LIMIT:
-                print("-----------------------%s----------------------" % str(data_size))
-                new_chunks = self.split_chunk(chunk)
-                for small_chunk in new_chunks:
-                    self._kinesis_client.put_records(
-                        StreamName=self._stream_name,
-                        Records=[
-                            {
-                                'Data': _serialize_item(item),
-                                'PartitionKey': self._partition_key_callable(item),
-                            }
-                            for item in small_chunk
-                            if item is not sentinel
-                        ],
-                    )
+                # print("-----------------------%s----------------------" % str(data_size))
+                # new_chunks = self.split_chunk(chunk)
+                # for small_chunk in new_chunks:
+                #     self._kinesis_client.put_records(
+                #         StreamName=self._stream_name,
+                #         Records=[
+                #             {
+                #                 'Data': _serialize_item(item),
+                #                 'PartitionKey': self._partition_key_callable(item),
+                #             }
+                #             for item in small_chunk
+                #             if item is not sentinel
+                #         ],
+                #     )
                 continue
                 # file_bigblock.write( i + " " + data + "\n")
                 # i = i+1
@@ -104,24 +104,24 @@ class KinesisItemExporter:
     def close(self):
         pass
 
-    def split_chunk(chunk):
-        subchunks = [chunk]
-        results = []
-        while subchunks != []:
-            subchunk = subchunks[0]
-            items_size = len(subchunk)
-            left_chunk = subchunk[:int(items_size/2)]
-            right_chunk = subchunk[int(items_size/2):]
-            if len(json.dumps(left_chunk, default=str).encode("utf-8")) > self.KINESIS_SIZE_LIMIT:
-                subchunks.append(left_chunk)
-            else:
-                results.append(left_chunk)
-            if len(json.dumps(right_chunk, default=str).encode("utf-8")) > self.KINESIS_SIZE_LIMIT:
-                subchunks.append(right_chunk)
-            else:
-                results.append(right_chunk)
-            subchunks.pop(0)
-        return results
+    # def split_chunk(chunk):
+    #     subchunks = [chunk]
+    #     results = []
+    #     while subchunks != []:
+    #         subchunk = subchunks[0]
+    #         items_size = len(subchunk)
+    #         left_chunk = subchunk[:int(items_size/2)]
+    #         right_chunk = subchunk[int(items_size/2):]
+    #         if len(json.dumps(left_chunk, default=str).encode("utf-8")) > self.KINESIS_SIZE_LIMIT:
+    #             subchunks.append(left_chunk)
+    #         else:
+    #             results.append(left_chunk)
+    #         if len(json.dumps(right_chunk, default=str).encode("utf-8")) > self.KINESIS_SIZE_LIMIT:
+    #             subchunks.append(right_chunk)
+    #         else:
+    #             results.append(right_chunk)
+    #         subchunks.pop(0)
+    #     return results
 
 
 
