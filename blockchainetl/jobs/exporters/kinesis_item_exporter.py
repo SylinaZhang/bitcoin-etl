@@ -63,8 +63,25 @@ class KinesisItemExporter:
             # file_bigblock = open('~/bigblock.txt', 'w')
             # i = 0
 
-            if data_size > KINESIS_SIZE_LIMIT:
-                # print("-----------------------%s----------------------" % str(data_size))
+            if data_size > self.KINESIS_SIZE_LIMIT:
+                print("-----------------------%s----------------------" % str(data_size))
+                for item in chunk:
+                    if item is sentinel:
+                        continue
+                    item_data = json.dumps(item, default=str).encode('utf-8')
+                    if item["type"] == "transaction" and len(item_data) > self.KINESIS_SIZE_LIMIT:
+                        item["inputs"] = "sylina"
+                        item["outputs"] = "fangyi"
+                    self._kinesis_client.put_records(
+                         StreamName=self._stream_name,
+                         Records=[
+                             {
+                                'Data': _serialize_item(item),
+                                'PartitionKey': self._partition_key_callable(item),
+                            }
+                         ],
+                     )
+                continue
                 # new_chunks = self.split_chunk(chunk)
                 # for small_chunk in new_chunks:
                 #     self._kinesis_client.put_records(
@@ -78,7 +95,7 @@ class KinesisItemExporter:
                 #             if item is not sentinel
                 #         ],
                 #     )
-                continue
+                # continue
                 # file_bigblock.write( i + " " + data + "\n")
                 # i = i+1
                 # continue
